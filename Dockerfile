@@ -1,4 +1,4 @@
-# Minimal Dockerfile - No requirements.txt issues
+# Complete Dockerfile - Copy all necessary files
 FROM python:3.9-slim
 
 # Environment
@@ -9,32 +9,37 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Working directory
 WORKDIR /app
 
-# Install dependencies one by one (no requirements.txt)
+# Install basic dependencies
 RUN pip install --no-cache-dir \
     flask==2.3.3 \
     ccxt==4.1.0 \
     requests==2.31.0 \
     pandas==2.1.0 \
-    numpy==1.24.0 \
-    python-telegram-bot==20.5
+    numpy==1.24.0
 
-# Copy only main application file
-COPY main.py ./
-COPY config.py ./
+# Copy ALL Python files (to avoid missing dependencies)
+COPY *.py ./
 
-# Create a minimal config if not exists
-RUN echo "# Minimal config for Cloud Run" > config_minimal.py
-
-# Create directories
+# Create necessary directories
 RUN mkdir -p logs models backtest_cache reports data
+
+# Create a minimal requirements file (fallback)
+RUN echo "flask==2.3.3" > requirements.txt
+
+# Install curl for health check
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Expose port
 EXPOSE $PORT
 
-# Health check with curl
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:$PORT/health || exit 1
 
-# Run main.py with minimal dependencies
-CMD python main.py --test-local
+# Debug startup command (shows what's happening)
+CMD echo "Starting Bot V3.0..." && \
+    echo "PORT=$PORT" && \
+    echo "Files in /app:" && \
+    ls -la && \
+    echo "Starting Python..." && \
+    python main.py --test-local

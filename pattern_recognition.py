@@ -20,7 +20,7 @@ except ImportError:
     SCIPY_AVAILABLE = False
 
 try:
-    import talib
+    import ta
     TALIB_AVAILABLE = True
 except ImportError:
     logger.warning("TA-Lib not available. Using manual calculations.")

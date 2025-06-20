@@ -25,7 +25,7 @@ try:
     from signal_formatter import SignalFormatter
     from news_analyzer import NewsAnalyzer
     from ml_predictor import MLPredictor
-    from pattern_recognition import PatternRecognition
+    from pattern_recognition import AdvancedPatternRecognition as PatternRecognition
     from backtesting_engine import BacktestingEngine
 except ImportError as e:
     print(f"❌ Error importing modules: {e}")
@@ -823,7 +823,7 @@ def shutdown_handler(signum, frame):
         scheduler_thread.join(timeout=10)
     
     # Shutdown executor
-    executor.shutdown(wait=True, timeout=30)
+    executor.shutdown(wait=True)
     
     logger.info("✅ Graceful shutdown completed")
     sys.exit(0)
